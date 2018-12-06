@@ -411,6 +411,19 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
         }
 
         [Fact]
+        public async Task Concurrent_query()
+        {
+            var tasks = new List<Task>();
+            var batchCount = 20;
+            for (var i = 0; i < batchCount; i++)
+            {
+                tasks.Add(ExecuteUnitOfWorkAsync(zooDbContext => Task.Run(() => zooDbContext.Employees
+                                                                                            .FirstOrDefault(e => e.FirstName == $"{DateTime.Now.Ticks}"))));
+            }
+            await Task.WhenAll(tasks);
+        }
+
+        [Fact]
         public async Task Can_list_async_twice()
         {
             await ExecuteUnitOfWorkAsync(async zooDbContext =>
