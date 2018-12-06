@@ -410,6 +410,38 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
             });
         }
 
+        [Fact]
+        public async Task Can_list_async_twice()
+        {
+            await ExecuteUnitOfWorkAsync(async zooDbContext =>
+            {
+                zooDbContext.Animals.AddRange(_zooEntities.Animals);
+                Assert.Equal(
+                             _zooEntities.Entities.Count,
+                             await zooDbContext.SaveChangesAsync(acceptAllChangesOnSuccess: true));
+            });
+
+            await ExecuteUnitOfWorkAsync(async zooDbContext =>
+            {
+                Assert.Equal(_zooEntities.Animals,
+                             await zooDbContext.Animals
+                                               .OrderBy(animal => animal.Name)
+                                               .ThenBy(animal => animal.Height)
+                                               .ToListAsync(),
+                             new AnimalEqualityComparer());
+            });
+
+            await ExecuteUnitOfWorkAsync(async zooDbContext =>
+            {
+                Assert.Equal(_zooEntities.Animals,
+                             await zooDbContext.Animals
+                                               .OrderBy(animal => animal.Name)
+                                               .ThenBy(animal => animal.Height)
+                                               .ToListAsync(),
+                             new AnimalEqualityComparer());
+            });
+        }
+
         private static Enclosure AssignAssignments(Enclosure enclosure, IEnumerable<ZooAssignment> zooAssignments)
         {
             foreach (var pair in enclosure.WeeklySchedule.Assignments
