@@ -442,7 +442,8 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
                 {
                     // Total test case Cost 4 seconds no matter how many records in mongodb 
                     //var employee = GetMongoDbDatabase(zooDbContext).GetCollection<Employee>("employees")
-                    //                                               .Find(e => e.FirstName == $"{DateTime.Now.Ticks}");
+                    //                                               .Find(e => e.FirstName == $"{DateTime.Now.Ticks}")
+                    //                                               .FirstOrDefault();
 
                     // Total test case Cost almost 26 seconds if there are 60000 records in mongodb. It seems like that each query pull many records from mongodb.
                     // The more records in mongodb, the more time cost.
