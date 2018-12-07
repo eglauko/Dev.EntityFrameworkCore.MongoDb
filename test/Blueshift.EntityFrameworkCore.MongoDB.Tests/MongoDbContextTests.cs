@@ -8,6 +8,7 @@ using Blueshift.EntityFrameworkCore.MongoDB.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Xunit;
 
@@ -435,20 +436,22 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
         public async Task Concurrent_query()
         {
             var tasks = new List<Task>();
-            var batchCount = 100;
+            var batchCount = 1;
             for (var i = 0; i < batchCount; i++)
             {
                 tasks.Add(ExecuteUnitOfWorkAsync(zooDbContext => Task.Run(() =>
                 {
+
                     // Total test case Cost 4 seconds no matter how many records in mongodb 
-                    //var employee = GetMongoDbDatabase(zooDbContext).GetCollection<Employee>("employees")
-                    //                                               .Find(e => e.FirstName == $"{DateTime.Now.Ticks}")
-                    //                                               .FirstOrDefault();
+                    var mongoDatabase = GetMongoDbDatabase(zooDbContext);
+                    mongoDatabase.RunCommand<BsonDocument>(new BsonDocument("profile", 2));
+                    //var employee = mongoDatabase.GetCollection<Employee>("employees").AsQueryable()
+                    //                            .FirstOrDefault(e => e.FirstName == $"xxx{DateTime.Now.Ticks}");
 
                     // Total test case Cost almost 26 seconds if there are 60000 records in mongodb. It seems like that each query pull many records from mongodb.
                     // The more records in mongodb, the more time cost.
                     var employee = zooDbContext.Employees
-                                               .FirstOrDefault(e => e.FirstName == $"{DateTime.Now.Ticks}");
+                                               .FirstOrDefault(e => e.LastName == $"{DateTime.Now.Ticks}");
                 })));
             }
             await Task.WhenAll(tasks);
