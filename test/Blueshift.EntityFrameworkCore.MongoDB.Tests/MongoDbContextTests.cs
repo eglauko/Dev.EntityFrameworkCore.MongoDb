@@ -417,7 +417,7 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
         public async Task Concurrent_write()
         {
             var tasks = new List<Task>();
-            var batchCount = 30000;
+            var batchCount = 60000;
             for (var i = 0; i < batchCount; i++)
             {
                 await ExecuteUnitOfWorkAsync(async zooDbContext =>
@@ -444,7 +444,7 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
                     //var employee = GetMongoDbDatabase(zooDbContext).GetCollection<Employee>("employees")
                     //                                               .Find(e => e.FirstName == $"{DateTime.Now.Ticks}");
 
-                    // Total test case Cost almost 5 seconds if there are 60000 records in mongodb. It seems like that each query pull many records from mongodb.
+                    // Total test case Cost almost 26 seconds if there are 60000 records in mongodb. It seems like that each query pull many records from mongodb.
                     // The more records in mongodb, the more time cost.
                     var employee = zooDbContext.Employees
                                                .FirstOrDefault(e => e.FirstName == $"{DateTime.Now.Ticks}");
