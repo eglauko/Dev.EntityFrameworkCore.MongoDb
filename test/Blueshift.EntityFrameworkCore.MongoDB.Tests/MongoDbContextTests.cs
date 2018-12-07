@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Blueshift.EntityFrameworkCore.MongoDB.SampleDomain;
+using Blueshift.EntityFrameworkCore.MongoDB.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using MongoDB.Driver;
 using Xunit;
 
 namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
@@ -411,14 +414,41 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
         }
 
         [Fact]
+        public async Task Concurrent_write()
+        {
+            var tasks = new List<Task>();
+            var batchCount = 30000;
+            for (var i = 0; i < batchCount; i++)
+            {
+                await ExecuteUnitOfWorkAsync(async zooDbContext =>
+                {
+                    var employee = new Employee { FirstName = $"Taiga_{DateTime.Now.Ticks}", LastName = "Masuta", Age = 31.7M };
+                    zooDbContext.Add(employee);
+                    Assert.Equal(1, await zooDbContext.SaveChangesAsync(acceptAllChangesOnSuccess: true));
+                });
+            }
+
+            await Task.WhenAll(tasks);
+        }
+
+        [Fact]
         public async Task Concurrent_query()
         {
             var tasks = new List<Task>();
-            var batchCount = 20;
+            var batchCount = 100;
             for (var i = 0; i < batchCount; i++)
             {
-                tasks.Add(ExecuteUnitOfWorkAsync(zooDbContext => Task.Run(() => zooDbContext.Employees
-                                                                                            .FirstOrDefault(e => e.FirstName == $"{DateTime.Now.Ticks}"))));
+                tasks.Add(ExecuteUnitOfWorkAsync(zooDbContext => Task.Run(() =>
+                {
+                    // Total test case Cost 4 seconds no matter how many records in mongodb 
+                    //var employee = GetMongoDbDatabase(zooDbContext).GetCollection<Employee>("employees")
+                    //                                               .Find(e => e.FirstName == $"{DateTime.Now.Ticks}");
+
+                    // Total test case Cost almost 5 seconds if there are 60000 records in mongodb. It seems like that each query pull many records from mongodb.
+                    // The more records in mongodb, the more time cost.
+                    var employee = zooDbContext.Employees
+                                               .FirstOrDefault(e => e.FirstName == $"{DateTime.Now.Ticks}");
+                })));
             }
             await Task.WhenAll(tasks);
         }
@@ -477,6 +507,27 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
         {
             assignment.Assignee = assignee;
             return assignment;
+        }
+
+        private static MongoDbConnection GetMongoDbConnection(DbContext dbContext)
+        {
+            var creator = dbContext.Database
+                                   .GetType()
+                                   .GetProperty("DatabaseCreator", BindingFlags.NonPublic | BindingFlags.Instance)
+                                   ?.GetValue(dbContext.Database) as MongoDbDatabaseCreator;
+            var connection = creator?.GetType()
+                                    .GetField("_mongoDbConnection", BindingFlags.NonPublic | BindingFlags.Instance)
+                                    ?.GetValue(creator) as MongoDbConnection;
+            return connection;
+        }
+
+        private static IMongoDatabase GetMongoDbDatabase(DbContext dbContext)
+        {
+            var connection = GetMongoDbConnection(dbContext);
+
+            return connection?.GetType()
+                             .GetField("_mongoDatabase", BindingFlags.NonPublic | BindingFlags.Instance)
+                             ?.GetValue(connection) as IMongoDatabase;
         }
     }
 }

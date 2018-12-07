@@ -25,7 +25,7 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
 
         public void Dispose()
         {
-            ExecuteUnitOfWork(zooDbContext => zooDbContext.Database.EnsureDeleted());
+            //ExecuteUnitOfWork(zooDbContext => zooDbContext.Database.EnsureDeleted());
         }
 
         protected void ExecuteUnitOfWork(Action<ZooDbContext> unitOfWork)
