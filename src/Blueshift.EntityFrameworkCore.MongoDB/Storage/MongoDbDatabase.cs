@@ -101,7 +101,7 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Storage
             IEnumerable<Task<int>> tasks = Check.NotNull(entries, nameof(entries))
                 .ToLookup(entry => GetCollectionEntityType(entry.EntityType))
                 .Select(grouping => InvokeSaveChangesAsync(grouping, cancellationToken));
-            return await Task.WhenAll()
+            return await Task.WhenAll(tasks)
                 .ContinueWith(allTask => tasks.Sum(task => task.Result), cancellationToken);
         }
 

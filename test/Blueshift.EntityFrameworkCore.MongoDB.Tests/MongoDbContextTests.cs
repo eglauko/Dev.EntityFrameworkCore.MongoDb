@@ -417,12 +417,13 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
         public async Task Concurrent_write()
         {
             var tasks = new List<Task>();
-            var batchCount = 60000;
+            var batchCount = 1000;
             for (var i = 0; i < batchCount; i++)
             {
+                var j = i;
                 await ExecuteUnitOfWorkAsync(async zooDbContext =>
                 {
-                    var employee = new Employee { FirstName = $"Taiga_{DateTime.Now.Ticks}", LastName = "Masuta", Age = 31.7M };
+                    var employee = new Employee { FirstName = $"Taiga_{DateTime.Now.Ticks}_{j}", LastName = "Masuta", Age = 31.7M };
                     zooDbContext.Add(employee);
                     Assert.Equal(1, await zooDbContext.SaveChangesAsync(acceptAllChangesOnSuccess: true));
                 });
@@ -435,7 +436,7 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Tests
         public async Task Concurrent_query()
         {
             var tasks = new List<Task>();
-            var batchCount = 100;
+            var batchCount = 1;
             for (var i = 0; i < batchCount; i++)
             {
                 tasks.Add(ExecuteUnitOfWorkAsync(zooDbContext => Task.Run(() =>
