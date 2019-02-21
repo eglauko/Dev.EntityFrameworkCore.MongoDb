@@ -90,30 +90,18 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Infrastructure
             [NotNull] Action<MongoDbOptionsExtension> mongoDbOptionsExtensionAction,
             [CanBeNull] Action<MongoDbContextOptionsBuilder> mongoDbOptionsAction)
         {
-            MongoDbOptionsExtension extension = GetOrCreateExtension(optionsBuilder);
+            MongoDbOptionsExtension extension = new MongoDbOptionsExtension(
+                optionsBuilder.Options.FindExtension<MongoDbOptionsExtension>());
+
             mongoDbOptionsExtensionAction(extension);
+
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
 
-            ConfigureWarnings(optionsBuilder);
+            optionsBuilder.ConfigureWarnings(wcb => wcb.Default(WarningBehavior.Log));
 
             mongoDbOptionsAction?.Invoke(new MongoDbContextOptionsBuilder(optionsBuilder));
 
             return optionsBuilder;
         }
-
-        private static MongoDbOptionsExtension GetOrCreateExtension([NotNull] DbContextOptionsBuilder optionsBuilder)
-        {
-            var existing = optionsBuilder.Options.FindExtension<MongoDbOptionsExtension>();
-            return existing != null
-                ? new MongoDbOptionsExtension(existing)
-                : new MongoDbOptionsExtension();
-        }
-
-        private static void ConfigureWarnings([NotNull] DbContextOptionsBuilder optionsBuilder)
-            => Check.NotNull(optionsBuilder, nameof(optionsBuilder))
-                .ConfigureWarnings(warningsConfigurationBuilder =>
-                {
-                    warningsConfigurationBuilder.Default(WarningBehavior.Log);
-                });
     }
 }
