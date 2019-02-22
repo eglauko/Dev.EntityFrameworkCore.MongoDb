@@ -1,85 +1,58 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Blueshift.EntityFrameworkCore.MongoDB.Metadata;
-using Blueshift.EntityFrameworkCore.MongoDB.Metadata.Builders;
 using Blueshift.EntityFrameworkCore.MongoDB.Storage;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Utilities;
-using MongoDB.Driver;
 
 namespace Blueshift.EntityFrameworkCore.MongoDB.Query.Expressions
 {
     /// <inheritdoc />
     public class MongoDbDocumentQueryExpressionFactory : IDocumentQueryExpressionFactory
     {
-        private static readonly MethodInfo GetCollectionMethodInfo
-            = MethodHelper.GetGenericMethodDefinition<IMongoDatabase, object>(
-                mongoDatabase => mongoDatabase.GetCollection<object>("", null));
+        [NotNull] private readonly IQueryableMethodProvider _queryableMethodProvider;
+        [NotNull] private readonly IModel _model;
 
-        private static readonly MethodInfo AsQueryableMethodInfo
-            = MethodHelper.GetGenericMethodDefinition<IMongoCollection<object>, object>(
-                mongoCollection => mongoCollection.AsQueryable(null));
-
-        private static readonly MethodInfo OfTypeMethodInfo
-            = MethodHelper.GetGenericMethodDefinition<IQueryable<object>, object>(
-                queryable => queryable.OfType<object>());
+        private static readonly MethodInfo QueryMethodInfo
+            = MethodHelper.GetGenericMethodDefinition<IMongoDbConnection, object>(
+                mongoDbConnection => mongoDbConnection.Query<object>());
 
         private readonly IMongoDbConnection _mongoDbConnection;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MongoDbDocumentQueryExpressionFactory"/> class.
         /// </summary>
+        /// <param name="model">The <see cref="IModel"/> for the current data set.</param>
         /// <param name="mongoDbConnection">The <see cref="IMongoDbConnection"/> used to connect to the instance of MongoDb.</param>
+        /// <param name="queryableMethodProvider">The <see cref="IQueryableMethodProvider"/> used to reference <see cref="IQueryable"/> methods.</param>
         public MongoDbDocumentQueryExpressionFactory(
-            [NotNull] IMongoDbConnection mongoDbConnection)
+            [NotNull] IModel model,
+            [NotNull] IMongoDbConnection mongoDbConnection,
+            [NotNull] IQueryableMethodProvider queryableMethodProvider)
         {
+            _model = Check.NotNull(model, nameof(model));
             _mongoDbConnection = Check.NotNull(mongoDbConnection, nameof(mongoDbConnection));
+            _queryableMethodProvider = Check.NotNull(queryableMethodProvider, nameof(queryableMethodProvider));
         }
 
         /// <inheritdoc />
         public Expression CreateDocumentQueryExpression(IEntityType entityType)
         {
-            MongoDbEntityTypeAnnotations annotations = Check.NotNull(entityType, nameof(entityType)).MongoDb();
+            IEntityType collectionEntityType = entityType.GetMongoDbCollectionEntityType();
 
-            IEntityType queryEntityType = entityType;
+            Expression expression = Expression.Call(
+                Expression.Constant(_mongoDbConnection),
+                QueryMethodInfo.MakeGenericMethod(collectionEntityType.ClrType));
 
-            if (!entityType.IsDocumentRootEntityType())
+            if (collectionEntityType != entityType)
             {
-                entityType = entityType.GetMongoDbCollectionEntityType();
+                expression = Expression.Call(
+                    _queryableMethodProvider.OfType.MakeGenericMethod(entityType.ClrType),
+                    expression);
             }
 
-            Expression queryExpression = Expression.Call(
-                Expression.Constant(_mongoDbConnection.GetDatabase()),
-                GetCollectionMethodInfo.MakeGenericMethod(entityType.ClrType),
-                new Expression[]
-                {
-                    Expression.Constant(annotations.CollectionName),
-                    Expression.Constant(
-                        annotations.CollectionSettings,
-                        typeof(MongoCollectionSettings))
-                });
-
-            queryExpression = Expression.Call(
-                null,
-                AsQueryableMethodInfo.MakeGenericMethod(entityType.ClrType),
-                new []
-                {
-                    queryExpression,
-                    Expression.Constant(
-                        null,
-                        typeof(AggregateOptions))
-                });
-
-            if (queryEntityType != entityType)
-            {
-                queryExpression = Expression.Call(
-                    queryExpression,
-                    OfTypeMethodInfo.MakeGenericMethod(queryEntityType.ClrType));
-            }
-
-            return queryExpression;
+            return expression;
         }
     }
 }

@@ -5,19 +5,18 @@ using Microsoft.EntityFrameworkCore.Query.Internal;
 namespace Blueshift.EntityFrameworkCore.MongoDB.Query
 {
     /// <inheritdoc />
-    public class LinqQueryCompilationContextFactory : QueryCompilationContextFactory
+    public class QueryableQueryCompilationContextFactory : QueryCompilationContextFactory
     {
         /// <inheritdoc />
-        public LinqQueryCompilationContextFactory(
+        public QueryableQueryCompilationContextFactory(
             [NotNull] QueryCompilationContextDependencies dependencies) : base(dependencies)
         {
         }
 
         /// <inheritdoc />
         public override QueryCompilationContext Create(bool async)
-            => new QueryCompilationContext(
-                Dependencies,
-                new QueryableLinqOperatorProvider(),
+            => new QueryCompilationContext(Dependencies,
+                new EnumerableLinqOperatorProvider(),
                 TrackQueryResults);
     }
 }

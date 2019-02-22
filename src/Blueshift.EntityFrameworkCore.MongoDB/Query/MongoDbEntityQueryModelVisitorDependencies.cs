@@ -43,19 +43,44 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Query
         /// <param name="mongoDbDenormalizedCollectionCompensatingVisitorFactory">
         ///     The <see cref="IMongoDbDenormalizedCollectionCompensatingVisitorFactory" /> to be used when processing the query.
         /// </param>
+        /// <param name="queryableMethodProvider">
+        ///     The <see cref="IQueryableMethodProvider" /> to be used when processing a query.
+        /// </param>
+        /// <param name="nullConditionalExpressionCompensatingExpressionVisitorFactory">
+        ///     The <see cref="INullConditionalExpressionCompensatingExpressionVisitorFactory" /> to be used when filtering an expression tree.
+        /// </param>
         public MongoDbEntityQueryModelVisitorDependencies(
-            [NotNull] IMongoDbDenormalizedCollectionCompensatingVisitorFactory mongoDbDenormalizedCollectionCompensatingVisitorFactory
-            )
+            [NotNull] IMongoDbDenormalizedCollectionCompensatingVisitorFactory mongoDbDenormalizedCollectionCompensatingVisitorFactory,
+            [NotNull] IQueryableMethodProvider queryableMethodProvider,
+            [NotNull] INullConditionalExpressionCompensatingExpressionVisitorFactory nullConditionalExpressionCompensatingExpressionVisitorFactory)
         {
             MongoDbDenormalizedCollectionCompensatingVisitorFactory
                 = Check.NotNull(mongoDbDenormalizedCollectionCompensatingVisitorFactory,
                     nameof(mongoDbDenormalizedCollectionCompensatingVisitorFactory));
+            QueryableMethodProvider = Check.NotNull(queryableMethodProvider, nameof(queryableMethodProvider));
+            NullConditionalExpressionCompensatingExpressionVisitorFactory = 
+                Check.NotNull(nullConditionalExpressionCompensatingExpressionVisitorFactory,
+                    nameof(nullConditionalExpressionCompensatingExpressionVisitorFactory));
         }
 
         /// <summary>
         ///     Gets the <see cref="IMongoDbDenormalizedCollectionCompensatingVisitorFactory" /> to be used when processing a query.
         /// </summary>
+        [NotNull]
         public IMongoDbDenormalizedCollectionCompensatingVisitorFactory
             MongoDbDenormalizedCollectionCompensatingVisitorFactory { get; }
+
+        /// <summary>
+        ///     Gets the <see cref="IQueryableMethodProvider" /> to be used when processing a query.
+        /// </summary>
+        [NotNull]
+        public IQueryableMethodProvider QueryableMethodProvider { get; }
+
+        /// <summary>
+        ///     Gets the <see cref="INullConditionalExpressionCompensatingExpressionVisitorFactory" /> to be used when filtering an expression tree.
+        /// </summary>
+        [NotNull]
+        public INullConditionalExpressionCompensatingExpressionVisitorFactory NullConditionalExpressionCompensatingExpressionVisitorFactory { get; }
+
     }
 }
