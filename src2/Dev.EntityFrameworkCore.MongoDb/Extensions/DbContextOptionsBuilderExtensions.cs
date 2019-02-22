@@ -1,9 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using Valles.EntityFrameworkCore.MongoDb.Infrastructure;
+using Dev.EntityFrameworkCore.MongoDb.Infrastructure;
 
 namespace Microsoft.EntityFrameworkCore
 {

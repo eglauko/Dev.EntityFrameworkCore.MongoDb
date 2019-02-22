@@ -60,16 +60,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blueshift.Identity.MongoDB"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blueshift.Identity.MongoDB.Tests", "test\Blueshift.Identity.MongoDB.Tests\Blueshift.Identity.MongoDB.Tests.csproj", "{E7AF1BE9-6017-4FDF-BDEC-B3FAC1888A25}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{04CEB217-71E2-4DBD-B35A-737EE7D258B8}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{EA4A30B2-F661-4596-B0B4-27516049A8EF}"
 	ProjectSection(SolutionItems) = preProject
 		tools\Resources.tt = tools\Resources.tt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valles.EntityFrameworkCore.MongoDb", "src2\Valles.EntityFrameworkCore.MongoDb\Valles.EntityFrameworkCore.MongoDb.csproj", "{5D10DFF3-F924-4EA0-8497-F66A6508036F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src2", "src2", "{DAECDC96-2E00-4207-9A0E-58F702E4DE71}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dev.EntityFrameworkCore.MongoDb", "src2\Dev.EntityFrameworkCore.MongoDb\Dev.EntityFrameworkCore.MongoDb.csproj", "{CD7524BA-98C7-4CF3-842E-7AF535E41D3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dev.EntityFrameworkCore.Sample", "..\Dev.EntityFrameworkCore.Sample\Dev.EntityFrameworkCore.Sample.csproj", "{12DB4C61-E42F-4D2A-AC33-E35A80786108}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,14 +97,14 @@ Global
 		{E7AF1BE9-6017-4FDF-BDEC-B3FAC1888A25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7AF1BE9-6017-4FDF-BDEC-B3FAC1888A25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7AF1BE9-6017-4FDF-BDEC-B3FAC1888A25}.Release|Any CPU.Build.0 = Release|Any CPU
-		{04CEB217-71E2-4DBD-B35A-737EE7D258B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04CEB217-71E2-4DBD-B35A-737EE7D258B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{04CEB217-71E2-4DBD-B35A-737EE7D258B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04CEB217-71E2-4DBD-B35A-737EE7D258B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5D10DFF3-F924-4EA0-8497-F66A6508036F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D10DFF3-F924-4EA0-8497-F66A6508036F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D10DFF3-F924-4EA0-8497-F66A6508036F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D10DFF3-F924-4EA0-8497-F66A6508036F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD7524BA-98C7-4CF3-842E-7AF535E41D3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD7524BA-98C7-4CF3-842E-7AF535E41D3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD7524BA-98C7-4CF3-842E-7AF535E41D3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD7524BA-98C7-4CF3-842E-7AF535E41D3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12DB4C61-E42F-4D2A-AC33-E35A80786108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12DB4C61-E42F-4D2A-AC33-E35A80786108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12DB4C61-E42F-4D2A-AC33-E35A80786108}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12DB4C61-E42F-4D2A-AC33-E35A80786108}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -116,7 +116,8 @@ Global
 		{314B80D1-CBB7-4EF5-A5BD-3AD9F14069E8} = {258D5057-81B9-40EC-A872-D21E27452749}
 		{85A1B2BB-BF46-445A-85C3-CFB1CCCB33CE} = {CE6B50B2-34AE-44C9-940A-4E48C3E1B3BC}
 		{E7AF1BE9-6017-4FDF-BDEC-B3FAC1888A25} = {258D5057-81B9-40EC-A872-D21E27452749}
-		{5D10DFF3-F924-4EA0-8497-F66A6508036F} = {DAECDC96-2E00-4207-9A0E-58F702E4DE71}
+		{CD7524BA-98C7-4CF3-842E-7AF535E41D3D} = {DAECDC96-2E00-4207-9A0E-58F702E4DE71}
+		{12DB4C61-E42F-4D2A-AC33-E35A80786108} = {DAECDC96-2E00-4207-9A0E-58F702E4DE71}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AA7DD3E1-6124-4D69-A1C3-E4D643A5C4D5}

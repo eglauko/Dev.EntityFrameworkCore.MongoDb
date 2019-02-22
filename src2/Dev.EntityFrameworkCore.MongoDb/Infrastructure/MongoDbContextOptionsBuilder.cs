@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver;
 using System;
 
-namespace Valles.EntityFrameworkCore.MongoDb.Infrastructure
+namespace Dev.EntityFrameworkCore.MongoDb.Infrastructure
 {
     public class MongoDbContextOptionsBuilder
     {
@@ -18,9 +18,21 @@ namespace Valles.EntityFrameworkCore.MongoDb.Infrastructure
             return this;
         }
 
-        public MongoDbContextOptionsBuilder UseConnectionString(MongoUrl url)
+        public MongoDbContextOptionsBuilder UseMongoUrl(MongoUrl url)
         {
             extension.MongoUrl = url ?? throw new ArgumentNullException(nameof(url));
+            return this;
+        }
+
+        public MongoDbContextOptionsBuilder UseMongoUrlBuilder(Action<MongoUrlBuilder> buildAction)
+        {
+            if (buildAction == null)
+                throw new ArgumentNullException(nameof(buildAction));
+
+            var builder = new MongoUrlBuilder();
+            buildAction(builder);
+            extension.MongoUrl = builder.ToMongoUrl();
+
             return this;
         }
     }

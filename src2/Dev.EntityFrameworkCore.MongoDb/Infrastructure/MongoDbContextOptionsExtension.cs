@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using Dev.EntityFrameworkCore.MongoDb.Exceptions;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Valles.EntityFrameworkCore.MongoDb.Infrastructure
+namespace Dev.EntityFrameworkCore.MongoDb.Infrastructure
 {
     public class MongoDbContextOptionsExtension : IDbContextOptionsExtension
     {
@@ -53,16 +54,34 @@ namespace Valles.EntityFrameworkCore.MongoDb.Infrastructure
 
         public bool ApplyServices(IServiceCollection services)
         {
-            var servicesBuilder = new MongoDbServicesBuilder(services);
+            var servicesBuilder = new MongoDbServicesBuilder(services, this);
             servicesBuilder.TryAddCoreServices();
             return true;
         }
 
         public long GetServiceProviderHashCode() => 51_481_626_487_740_572;
 
-        public void PopulateDebugInfo(IDictionary<string, string> debugInfo) { }
+        public void PopulateDebugInfo(IDictionary<string, string> debugInfo)
+        {
+            debugInfo["MongoDb"] = "1";
+        }
 
-        public void Validate(IDbContextOptions options) { }
+        public void Validate(IDbContextOptions options)
+        {
+            var ext = options.FindExtension<MongoDbContextOptionsExtension>();
+
+            if (ext == null)
+                throw new DbContextOptionsException(
+                    "MongoDb Context Options Extension Not Founded.");
+
+            if (ext.MongoUrl == null)
+                throw new DbContextOptionsException(
+                    "MongoUrl has not been informed and it will not be able to connect to a database.");
+
+            if (string.IsNullOrEmpty(ext.MongoUrl.DatabaseName))
+                throw new DbContextOptionsException(
+                    "Database Name of MongoUrl has not been informed and it will not be able to connect to a database.");
+        }
 
         #endregion
     }
