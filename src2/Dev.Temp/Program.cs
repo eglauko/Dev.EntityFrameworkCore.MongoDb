@@ -36,6 +36,8 @@ namespace Dev.Temp
                     Console.WriteLine(empresa.ToString());
                 }
             }
+
+            Console.ReadKey();
         }
     }
 }

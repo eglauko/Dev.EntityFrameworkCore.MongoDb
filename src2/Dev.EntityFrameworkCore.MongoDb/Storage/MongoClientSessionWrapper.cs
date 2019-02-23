@@ -9,12 +9,10 @@ namespace Dev.EntityFrameworkCore.MongoDb.Storage
     {
         private readonly MongoClientWrapper mongoClient;
         private IClientSessionHandle _clientSession;
-        private Dictionary<string, IMongoCollection<BsonDocument>> collections;
 
         public MongoClientSessionWrapper(MongoClientWrapper mongoClient)
         {
             this.mongoClient = mongoClient;
-            collections = new Dictionary<string, IMongoCollection<BsonDocument>>();
         }
 
         public IClientSessionHandle ClientSession
@@ -36,14 +34,9 @@ namespace Dev.EntityFrameworkCore.MongoDb.Storage
 
         public void CommitTransaction() => ClientSession.CommitTransaction();
 
-        public IMongoCollection<BsonDocument> GetCollection(string name)
+        public IMongoCollection<TEntity> GetCollection<TEntity>(string name)
         {
-            if (!collections.TryGetValue(name, out var collection))
-            {
-                collection = mongoClient.MongoDatabase.GetCollection<BsonDocument>(name);
-                collections.Add(name, collection);
-            }
-            return collection;
+            return mongoClient.GetCollection<TEntity>(name);
         }
             
 
@@ -54,7 +47,6 @@ namespace Dev.EntityFrameworkCore.MongoDb.Storage
                 var old = _clientSession;
                 _clientSession = null;
                 old.Dispose();
-                collections.Clear();
             }
         }
     }

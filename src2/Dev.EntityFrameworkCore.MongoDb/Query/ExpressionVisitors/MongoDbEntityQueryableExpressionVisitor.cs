@@ -25,15 +25,22 @@ namespace Dev.EntityFrameworkCore.MongoDb.Query
 
         protected override Expression VisitEntityQueryable(Type elementType)
         {
-            var a = QueryModelVisitor.QueryCompilationContext.Model.FindEntityType(elementType.Name);
-            var b = QueryModelVisitor.QueryCompilationContext.Model.FindEntityType(elementType.FullName);
+            var et = QueryModelVisitor.QueryCompilationContext.Model.FindEntityType(elementType.FullName);
 
-            var name = (a ?? b).Name;
-            var col = session.GetCollection(name);
+            var name = et.FindAnnotation("DbName")?.Value ?? et.Name;
 
-            var query = col.AsQueryable();
+            var method = typeof(IMongoCollectionExtensions).GetMethod("AsQueryable").MakeGenericMethod(et.ClrType);
 
-            return Expression.Constant(query);
+            return Expression.Call(
+                method,
+                Expression.Call(
+                    Expression.Constant(session),
+                    "GetCollection",
+                    new Type[] { et.ClrType },
+                    Expression.Constant(name)),
+                Expression.Constant(
+                    null, 
+                    typeof(AggregateOptions)));
         }
     }
 }
