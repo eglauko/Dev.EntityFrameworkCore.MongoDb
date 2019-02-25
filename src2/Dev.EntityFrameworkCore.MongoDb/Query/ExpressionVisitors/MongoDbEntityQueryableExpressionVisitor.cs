@@ -17,7 +17,8 @@ namespace Dev.EntityFrameworkCore.MongoDb.Query
 
         public MongoDbEntityQueryableExpressionVisitor(
             EntityQueryModelVisitor entityQueryModelVisitor,
-            IQuerySource querySource, MongoClientSessionWrapper session) : base (entityQueryModelVisitor)
+            IQuerySource querySource, 
+            MongoClientSessionWrapper session) : base (entityQueryModelVisitor)
         {
             this.querySource = querySource;
             this.session = session;
@@ -30,7 +31,7 @@ namespace Dev.EntityFrameworkCore.MongoDb.Query
             var name = et.FindAnnotation("DbName")?.Value ?? et.Name;
 
             var method = typeof(IMongoCollectionExtensions).GetMethod("AsQueryable").MakeGenericMethod(et.ClrType);
-
+            
             return Expression.Call(
                 method,
                 Expression.Call(

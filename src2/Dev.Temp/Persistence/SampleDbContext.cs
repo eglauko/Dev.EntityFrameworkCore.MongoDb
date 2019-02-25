@@ -14,6 +14,7 @@ namespace Dev.Temp.Persistence
                 b.HasAnnotation("DbName", "Empresa");
                 b.HasKey(e => e.Id);
                 b.Property(e => e.Id).HasAnnotation("DbName", "_id");
+                b.Property(e => e.Apelido).HasAnnotation("DbName", "NomeFantasia");
             });
 
             base.OnModelCreating(modelBuilder);

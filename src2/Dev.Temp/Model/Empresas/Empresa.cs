@@ -6,9 +6,11 @@
 
         public string Nome { get; set; }
 
+        public string Apelido { get; set; }
+
         public override string ToString()
         {
-            return $"Empresa [{Id}] {Nome}";
+            return $"Empresa [{Id}] {Nome}, {Apelido}";
         }
     }
 }
