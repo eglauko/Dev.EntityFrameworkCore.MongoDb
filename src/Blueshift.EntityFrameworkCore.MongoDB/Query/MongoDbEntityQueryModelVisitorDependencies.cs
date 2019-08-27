@@ -1,5 +1,5 @@
-﻿using Blueshift.EntityFrameworkCore.MongoDB.Query.ExpressionVisitors;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Utilities;
 
 namespace Blueshift.EntityFrameworkCore.MongoDB.Query
@@ -40,35 +40,21 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Query
         ///         the constructor at any point in this process.
         ///     </para>
         /// </summary>
-        /// <param name="mongoDbDenormalizedCollectionCompensatingVisitorFactory">
-        ///     The <see cref="IMongoDbDenormalizedCollectionCompensatingVisitorFactory" /> to be used when processing the query.
-        /// </param>
         /// <param name="queryableMethodProvider">
         ///     The <see cref="IQueryableMethodProvider" /> to be used when processing a query.
         /// </param>
-        /// <param name="linqProviderFilteringExpressionVisitorFactory">
-        ///     The <see cref="ILinqProviderFilteringExpressionVisitorFactory" /> to be used when filtering an expression tree.
+        /// <param name="entityQueryModelVisitorServiceFactory">
+        ///     The <see cref="IEntityQueryModelVisitorServiceFactory" /> used to create services consumed by an <see cref="EntityQueryModelVisitor"/>.
         /// </param>
         public MongoDbEntityQueryModelVisitorDependencies(
-            [NotNull] IMongoDbDenormalizedCollectionCompensatingVisitorFactory mongoDbDenormalizedCollectionCompensatingVisitorFactory,
             [NotNull] IQueryableMethodProvider queryableMethodProvider,
-            [NotNull] ILinqProviderFilteringExpressionVisitorFactory linqProviderFilteringExpressionVisitorFactory)
+            [NotNull] IEntityQueryModelVisitorServiceFactory entityQueryModelVisitorServiceFactory)
         {
-            MongoDbDenormalizedCollectionCompensatingVisitorFactory
-                = Check.NotNull(mongoDbDenormalizedCollectionCompensatingVisitorFactory,
-                    nameof(mongoDbDenormalizedCollectionCompensatingVisitorFactory));
             QueryableMethodProvider = Check.NotNull(queryableMethodProvider, nameof(queryableMethodProvider));
-            LinqProviderFilteringExpressionVisitorFactory = 
-                Check.NotNull(linqProviderFilteringExpressionVisitorFactory,
-                    nameof(linqProviderFilteringExpressionVisitorFactory));
+            EntityQueryModelVisitorServiceFactory = 
+                Check.NotNull(entityQueryModelVisitorServiceFactory,
+                    nameof(entityQueryModelVisitorServiceFactory));
         }
-
-        /// <summary>
-        ///     Gets the <see cref="IMongoDbDenormalizedCollectionCompensatingVisitorFactory" /> to be used when processing a query.
-        /// </summary>
-        [NotNull]
-        public IMongoDbDenormalizedCollectionCompensatingVisitorFactory
-            MongoDbDenormalizedCollectionCompensatingVisitorFactory { get; }
 
         /// <summary>
         ///     Gets the <see cref="IQueryableMethodProvider" /> to be used when processing a query.
@@ -77,10 +63,10 @@ namespace Blueshift.EntityFrameworkCore.MongoDB.Query
         public IQueryableMethodProvider QueryableMethodProvider { get; }
 
         /// <summary>
-        ///     Gets the <see cref="ILinqProviderFilteringExpressionVisitorFactory" /> to be used when filtering an expression tree.
+        ///     Gets the <see cref="IEntityQueryModelVisitorServiceFactory" /> used to create services consumed by an <see cref="EntityQueryModelVisitor"/>.
         /// </summary>
         [NotNull]
-        public ILinqProviderFilteringExpressionVisitorFactory LinqProviderFilteringExpressionVisitorFactory { get; }
+        public IEntityQueryModelVisitorServiceFactory EntityQueryModelVisitorServiceFactory { get; }
 
     }
 }
